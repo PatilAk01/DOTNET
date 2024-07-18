@@ -1,0 +1,174 @@
+using Microsoft.Data.SqlClient;
+using System.Data;
+
+namespace Module_Binding01.Models
+{
+
+
+    public class Employees
+    {
+        public int EmpNo { get; set; }
+        public string Name { get; set; }
+        public decimal Basic { get; set; }
+        public int DeptNo { get; set; }
+
+
+        public static List<Employees> GetAllEmployees()
+        {
+            List<Employees> lstEmps = new List<Employees>();
+
+            SqlConnection cn = new SqlConnection();
+            //Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ycpjune2024;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=YCPJune2024;Integrated Security=True";
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = cn;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "select * from Employees";
+
+                SqlDataReader dr = cmd.ExecuteReader();
+                //dr.HasRows
+                while (dr.Read())
+                {
+                    Employees employee = new Employees();
+                    employee.EmpNo = dr.GetInt32("EmpNo");
+                    employee.Name = dr.GetString("Name");
+                    employee.Basic = dr.GetDecimal("Basic");
+                    employee.DeptNo = dr.GetInt32("DeptNo");
+
+                    lstEmps.Add(employee);
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+            return lstEmps;
+        }
+        public static Employees GetSingleEmployee(int EmpNo)
+        {
+            Employees emp = new Employees();
+
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=YCPJune2024;Integrated Security=True";
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = cn;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "select * from Employees where EmpNo =@EmpNo";
+                cmd.Parameters.AddWithValue("@EmpNo", EmpNo);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                {
+                    emp.EmpNo = dr.GetInt32("EmpNo");
+                    emp.Name = dr.GetString("Name");
+                    emp.Basic = dr.GetDecimal("Basic");
+                    emp.DeptNo = dr.GetInt32("DeptNo");
+                }
+                else
+                {
+                    emp = null;
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+            return emp;
+        }
+
+        public static void Insert(Employees emp)
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=YCPJune2024;Integrated Security=True";
+            try
+            {
+                cn.Open();
+                SqlCommand cmdInsert = new SqlCommand();
+                cmdInsert.Connection = cn;
+                cmdInsert.CommandType = CommandType.Text;
+                cmdInsert.CommandText = "insert into Employees values(@Empno,@Name,@basic,@DeptNo)";
+                cmdInsert.Parameters.AddWithValue("@EmpNo", emp.EmpNo);
+                cmdInsert.Parameters.AddWithValue("@Name", emp.Name);
+                cmdInsert.Parameters.AddWithValue("@Basic", emp.Basic);
+                cmdInsert.Parameters.AddWithValue("@DeptNo", emp.DeptNo);
+
+
+                cmdInsert.ExecuteNonQuery();
+                Console.WriteLine("success");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+        }
+        public static void Update(Employees emp1)
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ycpjune2024;Integrated Security=True";
+
+            try
+            {
+                cn.Open();
+                SqlCommand cmd = cn.CreateCommand();
+                cmd.Connection = cn;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "update Employees set Name=@Name,Basic=@Basic,DeptNo=@DeptNo where EmpNo=@EmpNo";
+                // cmd.CommandText = "updateempolyees";
+                cmd.Parameters.AddWithValue("@EmpNo", emp1.EmpNo);
+                cmd.Parameters.AddWithValue("@Name", emp1.Name);
+                cmd.Parameters.AddWithValue("@Basic", emp1.Basic);
+                cmd.Parameters.AddWithValue("@DeptNo", emp1.DeptNo);
+
+                cmd.ExecuteNonQuery();
+
+                Console.WriteLine("Success");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+
+                cn.Close();
+            }
+        }
+        public static void Delete(int EmpNo)
+        {
+            SqlConnection cn = new SqlConnection();
+            cn.ConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ycpjune2024;Integrated Security=True";
+
+
+            cn.Open();
+            SqlCommand cmd = cn.CreateCommand();
+            cmd.Connection = cn;
+            cmd.CommandType = CommandType.Text;
+            cmd.CommandText = "delete from Employees where EmpNo=@EmpNo";
+            // cmd.CommandText = "updateempolyees";
+            cmd.Parameters.AddWithValue("@EmpNo", EmpNo);
+           
+            cmd.ExecuteNonQuery();
+
+
+        }
+    }
+} 
