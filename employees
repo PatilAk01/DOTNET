@@ -172,3 +172,157 @@ namespace Module_Binding01.Models
         }
     }
 } 
+
+
+*------------------------------------------*
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Module_Binding01.Models;
+
+namespace Module_Binding01.Controllers
+{
+    public class EmployeesController : Controller
+    {
+        // GET: EmployeesController
+        public ActionResult Index()
+        {
+            //List<Employees>emp= new List<Employees>();
+            //emp.Add(new Employees { EmpNo = 1, Name = "Akshay", Basic = 52023, DeptNo = 20 });
+            //emp.Add(new Employees { EmpNo = 2, Name = "Nishant", Basic = 80000, DeptNo = 30 });
+            //emp.Add(new Employees { EmpNo = 3, Name = "Dhiraj", Basic = 54423, DeptNo = 10 });
+
+            List<Employees> list =Employees.GetAllEmployees();
+
+            
+            
+            return View(list);
+
+           //eturn View(emp);
+        }
+
+        // GET: EmployeesController/Details/5
+        public ActionResult Details(int? id)
+        {
+            //Employees emp = new Employees();
+            //emp.EmpNo = 1;
+            //emp.Name = "Sujit";
+            //emp.Basic= 100000;
+            //emp.DeptNo = 20;
+
+            //return View(emp);
+
+            if (id == null)
+                return NotFound();
+
+            Employees obj = Employees.GetSingleEmployee(id.Value);
+            if (obj == null)
+                ViewBag.error = "No employee found";
+
+            return View(obj);
+        
+    }
+
+        // GET: EmployeesController/Create
+        public ActionResult Create()
+        {
+          
+            return View();
+        }
+
+        // POST: EmployeesController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // public ActionResult Create(IFormCollection collection)
+        // public ActionResult Create(int Empno,string Name,decimal Basic,int DeptNo)
+        public ActionResult Create(Employees obj)
+        {
+            try { 
+            Employees.Insert(obj);
+            ViewBag.message = "Success";
+            //return View();
+            return RedirectToAction("Index");
+        }
+            catch(Exception ex)
+            {
+                ViewBag.message = ex.Message;
+                return View();
+    }
+}
+
+        // GET: EmployeesController/Edit/5
+        public ActionResult Edit(int? id)
+        {
+            //Employees emp = new Employees();
+            //emp.EmpNo = 1;
+            //emp.Name = "Sujit";
+            //emp.Basic = 100000;
+            //emp.DeptNo = 20;
+            if (id == null)
+                return NotFound();
+
+            Employees obj = Employees.GetSingleEmployee(id.Value);
+            if (obj == null)
+                ViewBag.error = "No employee found";
+
+            return View(obj);
+        }
+
+        // POST: EmployeesController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int? id, Employees empl)
+        {
+            try
+            {
+                Employees.Update(empl);
+                //ViewBag.message = "Success";
+                //return View();
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+               // ViewBag.message = ex.Message;
+                return View();
+            }
+        }
+        // GET: EmployeesController/Delete/5
+        public ActionResult Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            
+            Employees obj = Employees.GetSingleEmployee(id.Value);
+            if (obj == null)
+            
+                ViewBag.error = "no employee found";
+                return View(obj);
+            
+
+            //Employees emp = new Employees();
+            //emp.EmpNo = 1;
+            //emp.Name = "Sujit";
+            //emp.Basic = 100000;
+            //emp.DeptNo = 20;
+
+            //return View(emp);
+
+        }
+
+        // POST: EmployeesController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int? id, Employees emp)
+        {
+            try
+            {
+                Employees.Delete(id.Value);
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+    }
+}
+
